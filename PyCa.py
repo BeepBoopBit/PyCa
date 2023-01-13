@@ -41,34 +41,14 @@ class PyCa:
         # Reference: https://developers.google.com/calendar/api/v3/reference/events/insert
         event = self.service.events().insert(calendarId=calendarId, body=event).execute()
         print('Event created: %s' % (event.get('htmlLink')))
-
+    def getEvent(self):
+        page_token = None
+        events = self.service.events().list(calendarId='primary', pageToken=page_token).execute()
+        for event in events['items']:
+            print (event['summary'] + ":" + str(event['start']['dateTime']))
+        page_token = events.get('nextPageToken')
+        return [event['summary'], event['start']['dateTime']]
 
 if __name__ == '__main__':
     newCalendar = PyCa()
-    data = {
-        'summary': 'Google I/O 2015',
-        'location': '800 Howard St., San Francisco, CA 94103',
-        'description': 'A chance to hear more about Google\'s developer products.',
-        'start': {
-            'dateTime': '2023-01-13T09:00:00-07:00',
-            'timeZone': 'Asia/Hong_Kong',
-        },
-        'end': {
-            'dateTime': '2023-01-13T17:00:00-07:00',
-            'timeZone': 'Asia/Hong_Kong',
-        },
-        'recurrence': [
-            'RRULE:FREQ=DAILY;COUNT=2'
-        ],
-        'attendees': [
-            {'email': 'cbgreywolfcb@gmail.com'}
-        ],
-        'reminders': {
-            'useDefault': False,
-            'overrides': [
-                {'method': 'email', 'minutes': 24 * 60},
-                {'method': 'popup', 'minutes': 10},
-            ],
-        },
-    }
-    newCalendar.createEvent('primary', data)
+    newCalendar.getEvent()
